@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -11,14 +14,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/films")
+@Slf4j
 public class FilmController {
 
-    private HashMap<Integer, Film> filmMap = new HashMap<>();
+    private final HashMap<Integer, Film> filmMap = new HashMap<>();
     int id = 1;
 
 
     @PostMapping
     public Film createFilm(@RequestBody Film film) throws ValidationException {
+        log.info("Получен запрос Post /users");
         validation(film);
         film.setId(id);
         filmMap.put(id, film);
@@ -29,7 +34,11 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) throws ValidationException {
+        log.info("Получен запрос Put /users");
         validation(film);
+        if(!filmMap.containsKey(film.getId())){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный id фильма");
+        }
         filmMap.put(film.getId(), film);
         return film;
     }
@@ -54,6 +63,7 @@ public class FilmController {
         } else {
             return;
         }
+        log.warn(message);
         throw new ValidationException(message);
     }
 
