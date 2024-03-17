@@ -49,21 +49,4 @@ public class FilmController {
     }
 
 
-    /*private void validation(Film film) throws ValidationException {
-        String message;
-        if (film.getName().isBlank()) {
-            message = "название не может быть пустым";
-        } else if (film.getDescription().length() > 200) {
-            message = "максимальная длина описания — 200 символов";
-        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            message = "дата релиза — не раньше 28 декабря 1895 года";
-        } else if (film.getDuration() < 0) {
-            message = "продолжительность фильма должна быть положительной";
-        } else {
-            return;
-        }
-        log.warn(message);
-        throw new ValidationException(message);
-    }*/
-
 }

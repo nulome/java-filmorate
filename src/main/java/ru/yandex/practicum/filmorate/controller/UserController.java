@@ -26,7 +26,6 @@ public class UserController {
     public User createUser(@RequestBody @Valid User user) throws ValidationException {
         log.info("Получен запрос Post /users");
         validation(user);
-        checkName(user);
         user.setId(id);
         userMap.put(id, user);
         id++;
@@ -39,9 +38,9 @@ public class UserController {
         log.info("Получен запрос Put /users");
         validation(user);
         if (!userMap.containsKey(user.getId())) {
-            throw new ValidationException("Не верный id пользователя");
+            log.warn("Не верный id пользователя");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный id пользователя");
         }
-        checkName(user);
         userMap.put(user.getId(), user);
 
         return user;
@@ -56,6 +55,7 @@ public class UserController {
 
 
     private void validation(User user) throws ValidationException {
+        checkName(user);
         String message;
         if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             message = "электронная почта не может быть пустой и должна содержать символ'@'";
