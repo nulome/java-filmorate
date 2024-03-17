@@ -1,10 +1,15 @@
-package ru.yandex.practicum.filmorate.exception;
+package ru.yandex.practicum.filmorate.related;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.IOException;
 
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class ValidationException extends Exception{
     public ValidationException() {
     }
+
 
     public ValidationException(String message) {
         super(message);

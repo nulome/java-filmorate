@@ -14,7 +14,7 @@ class FilmorateApplicationTests {
 	@BeforeEach
 	public void create(){
 		filmorateApplication = new FilmorateApplication();
-		SpringApplication.run(FilmorateApplication.class, );
+		//SpringApplication.run(FilmorateApplication.class, );
 
 	}
 

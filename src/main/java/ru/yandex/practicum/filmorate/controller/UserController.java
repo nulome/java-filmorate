@@ -5,9 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.related.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ public class UserController {
     int id = 1;
 
     @PostMapping
-    public User createUser(@RequestBody User user) throws ValidationException {
+    public User createUser(@RequestBody @Valid User user) throws ValidationException {
         log.info("Получен запрос Post /users");
         validation(user);
         checkName(user);
@@ -34,11 +35,11 @@ public class UserController {
 
 
     @PutMapping
-    public User updateUser(@RequestBody User user) throws ValidationException {
+    public User updateUser(@RequestBody @Valid User user) throws ValidationException {
         log.info("Получен запрос Put /users");
         validation(user);
         if (!userMap.containsKey(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный id пользователя");
+            throw new ValidationException("Не верный id пользователя");
         }
         checkName(user);
         userMap.put(user.getId(), user);
@@ -58,8 +59,6 @@ public class UserController {
         String message;
         if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             message = "электронная почта не может быть пустой и должна содержать символ'@'";
-        } else if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-            message = "логин не может быть пустым и содержать пробелы";
         } else if (user.getBirthday().isAfter(LocalDate.now())) {
             message = "дата рождения не может быть в будущем";
         } else {
