@@ -10,9 +10,12 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
+import static java.net.HttpURLConnection.HTTP_OK;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 class UserControllerTest {
 
@@ -45,6 +48,15 @@ class UserControllerTest {
         user.setName("");
         checkUser = userController.createUser(user);
         assertEquals(user.getLogin(), checkUser.getName(), "Не обновляется пустое значение имени");
+
+        List<User> list = userController.getUsers();
+        assertEquals(3, list.size(), "Не корректно возвращает список пользователей");
+
+        user.setName("nameUpdate");
+        user.setEmail("update@email");
+        user.setId(1);
+        userController.updateUser(user);
+        assertEquals(user, userController.getUsers().get(1), "Не корректно обновляет пользователя");
     }
 
     @Test
