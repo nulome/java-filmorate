@@ -13,9 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import static java.net.HttpURLConnection.HTTP_OK;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 class UserControllerTest {
 
@@ -79,7 +77,7 @@ class UserControllerTest {
         assertNull(checkUser, "Ошибка с пустым email не обрабатывается");
 
         user.setEmail("email@ru");
-        user.setBirthday(LocalDate.of(3500,1,1));
+        user.setBirthday(LocalDate.of(3500, 1, 1));
         ValidationException exceptionDateWarn = assertThrows(ValidationException.class, () -> {
             userController.createUser(user);
         }, "Дата рождения в будущем. Ожидалось исключение ValidationException.");

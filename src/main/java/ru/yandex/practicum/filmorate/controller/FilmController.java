@@ -4,11 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ru.yandex.practicum.filmorate.related.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +33,7 @@ public class FilmController {
     @PutMapping
     public Film updateFilm(@RequestBody @Valid Film film) {
         log.info("Получен запрос Put /users");
-        if(!filmMap.containsKey(film.getId())){
+        if (!filmMap.containsKey(film.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный id фильма");
         }
         filmMap.put(film.getId(), film);

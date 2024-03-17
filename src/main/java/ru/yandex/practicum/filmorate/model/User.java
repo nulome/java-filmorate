@@ -4,8 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.related.ConstraintUserLogin;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Past;
 import java.time.LocalDate;
 
 @Builder

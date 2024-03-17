@@ -11,9 +11,9 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(
-        validatedBy = {CustomFutureValidation.class}
+        validatedBy = {ConstraintReleaseDateValidation.class}
 )
-public @interface CustomFutureReleaseDate {
+public @interface ConstraintReleaseDate {
     String message() default "Дата релиза может бьть не раньше 28 декабря 1895 года";
 
     Class<?>[] groups() default {};

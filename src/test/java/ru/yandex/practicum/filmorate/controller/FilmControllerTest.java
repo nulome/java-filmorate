@@ -3,17 +3,16 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-
 import java.time.LocalDate;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class FilmControllerTest {
 
@@ -27,7 +26,7 @@ class FilmControllerTest {
         film = Film.builder()
                 .name("nameFilm")
                 .description("description")
-                .releaseDate(LocalDate.of(2000,1,1))
+                .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(80)
                 .build();
 
@@ -36,7 +35,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void checkTestMapping(){
+    void checkTestMapping() {
         Film checkFilm = filmController.createFilm(film);
         assertEquals(1, checkFilm.getId(), "Не записывается id");
 
@@ -53,17 +52,17 @@ class FilmControllerTest {
     }
 
     @Test
-    void checkValidationMethodFilmController(){
+    void checkValidationMethodFilmController() {
         film.setName(" ");
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty(), "Пропустил пустое название");
 
         film.setName("nameFilm");
-        film.setReleaseDate(LocalDate.of(1500,1,1));
+        film.setReleaseDate(LocalDate.of(1500, 1, 1));
         violations = validator.validate(film);
         assertFalse(violations.isEmpty(), "Фильм с невозможной датой релиза");
 
-        film.setReleaseDate(LocalDate.of(2000,1,1));
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(-3);
         violations = validator.validate(film);
         assertFalse(violations.isEmpty(), "Продолжительность фильма должна быть положительной");
