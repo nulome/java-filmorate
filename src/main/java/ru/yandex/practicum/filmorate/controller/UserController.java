@@ -24,7 +24,7 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody @Valid User user) throws ValidationException {
-        log.info("Получен запрос Post /users");
+        log.info("Получен запрос Post /users - {}", user.getLogin());
         validation(user);
         user.setId(id);
         userMap.put(id, user);
@@ -35,7 +35,7 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@RequestBody @Valid User user) throws ValidationException {
-        log.info("Получен запрос Put /users");
+        log.info("Получен запрос Put /users - {}", user.getLogin());
         validation(user);
         if (!userMap.containsKey(user.getId())) {
             log.warn("Не верный id пользователя");
@@ -57,9 +57,7 @@ public class UserController {
     private void validation(User user) throws ValidationException {
         checkName(user);
         String message;
-        if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            message = "электронная почта не может быть пустой и должна содержать символ'@'";
-        } else if (user.getBirthday().isAfter(LocalDate.now())) {
+        if (user.getBirthday().isAfter(LocalDate.now())) {
             message = "дата рождения не может быть в будущем";
         } else {
             return;

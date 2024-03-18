@@ -22,7 +22,7 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@RequestBody @Valid Film film) {
-        log.info("Получен запрос Post /users");
+        log.info("Получен запрос Post /films - {}", film.getName());
         film.setId(id);
         filmMap.put(id, film);
         id++;
@@ -32,7 +32,7 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@RequestBody @Valid Film film) {
-        log.info("Получен запрос Put /users");
+        log.info("Получен запрос Put /films - {}", film.getName());
         if (!filmMap.containsKey(film.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный id фильма");
         }
@@ -42,6 +42,7 @@ public class FilmController {
 
     @GetMapping
     public List<Film> getFilms() {
+        log.info("Получен запрос Get /films");
         List<Film> filmList = new ArrayList<>(filmMap.values());
         return filmList;
     }

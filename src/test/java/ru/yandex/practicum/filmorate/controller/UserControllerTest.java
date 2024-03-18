@@ -60,23 +60,7 @@ class UserControllerTest {
     @Test
     void checkValidationMethodUserController() throws ValidationException {
         User checkUser = null;
-        user.setEmail("email");
-        try {
-            checkUser = userController.createUser(user);
-        } catch (Exception ignored) {
 
-        }
-        assertNull(checkUser, "Ошибка с email без спец. символа не обрабатывается");
-
-        user.setEmail(" ");
-        try {
-            checkUser = userController.createUser(user);
-        } catch (Exception ignored) {
-
-        }
-        assertNull(checkUser, "Ошибка с пустым email не обрабатывается");
-
-        user.setEmail("email@ru");
         user.setBirthday(LocalDate.of(3500, 1, 1));
         ValidationException exceptionDateWarn = assertThrows(ValidationException.class, () -> {
             userController.createUser(user);
@@ -90,5 +74,15 @@ class UserControllerTest {
         user.setLogin("log in");
         violations = validator.validate(user);
         assertFalse(violations.isEmpty(), "Login не должен включать пробел");
+
+        user.setLogin("login");
+        user.setEmail("email");
+        violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "email должен включать спец. символ");
+
+        user.setEmail("  ");
+        violations = validator.validate(user);
+        assertFalse(violations.isEmpty(), "email не может быть пустым");
+
     }
 }
