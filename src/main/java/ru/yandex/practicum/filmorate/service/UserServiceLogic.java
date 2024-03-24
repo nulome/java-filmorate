@@ -85,6 +85,11 @@ public class UserServiceLogic implements UserService {
         return commonList;
     }
 
+    @Override
+    public User getUser(Integer id) {
+        return inMemoryUserStorage.getUser(id);
+    }
+
     private void validation(User user) {
         checkName(user);
         String message;

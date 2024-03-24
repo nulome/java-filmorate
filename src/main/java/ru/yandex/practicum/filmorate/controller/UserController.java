@@ -1,17 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.service.UserServiceLogic;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @AllArgsConstructor
@@ -24,7 +20,6 @@ public class UserController {
         return userServiceLogic.createUser(user);
     }
 
-
     @PutMapping
     public User updateUser(@RequestBody @Valid User user) {
         return userServiceLogic.updateUser(user);
@@ -33,5 +28,30 @@ public class UserController {
     @GetMapping
     public List<User> getUsers() {
         return userServiceLogic.getUsers();
+    }
+
+    @GetMapping("/{userId}")
+    public User getUser(@PathVariable int userId) {
+        return userServiceLogic.getUser(userId);
+    }
+
+    @PutMapping("/{userId}/friends/{friendId}")
+    public Set<Integer> addUserFriend(@PathVariable int userId, int friendId) {
+        return userServiceLogic.addUserFriend(userId, friendId);
+    }
+
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public Set<Integer> deleteUserFriend(@PathVariable int userId, int friendId) {
+        return userServiceLogic.deleteUserFriend(userId, friendId);
+    }
+
+    @GetMapping("/{userId}/friends")
+    public Set<Integer> getFriendsList(@PathVariable int userId) {
+        return userServiceLogic.getFriendsList(userId);
+    }
+
+    @GetMapping("/{userId}/friends/common/{otherId}")
+    public Set<Integer> getCommonFriend(@PathVariable int userId, int otherId) {
+        return userServiceLogic.getCommonFriend(userId, otherId);
     }
 }

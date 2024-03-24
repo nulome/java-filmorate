@@ -11,7 +11,8 @@ public interface FilmService {
     Film updateFilm(Film film);
 
     List<Film> getFilms();
-    Set<Integer> addLikes(Integer idFilm, Integer idUser);
-    Set<Integer> deleteLikes(Integer idFilm, Integer idUser);
+    Set<Integer> addLikes(Integer filmId, Integer userId);
+    Set<Integer> deleteLikes(Integer filmId, Integer userId);
     List<Film> getPopularMovies(Integer count);
+    Film getFilm(Integer id);
 }

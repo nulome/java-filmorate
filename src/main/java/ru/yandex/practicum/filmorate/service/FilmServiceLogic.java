@@ -40,19 +40,19 @@ public class FilmServiceLogic implements FilmService {
     }
 
     @Override
-    public Set<Integer> addLikes(Integer idFilm, Integer idUser) {
+    public Set<Integer> addLikes(Integer filmId, Integer userId) {
         log.debug("Получен запрос ***");
-        Film film = inMemoryFilmStorage.getFilm(idFilm);
-        film.getLikes().add(idUser);
+        Film film = inMemoryFilmStorage.getFilm(filmId);
+        film.getLikes().add(userId);
         inMemoryFilmStorage.updateFilm(film);
         return film.getLikes();
     }
 
     @Override
-    public Set<Integer> deleteLikes(Integer idFilm, Integer idUser) {
+    public Set<Integer> deleteLikes(Integer filmId, Integer userId) {
         log.debug("Получен запрос ***");
-        Film film = inMemoryFilmStorage.getFilm(idFilm);
-        film.getLikes().remove(idUser);
+        Film film = inMemoryFilmStorage.getFilm(filmId);
+        film.getLikes().remove(userId);
         inMemoryFilmStorage.updateFilm(film);
         return film.getLikes();
     }
@@ -65,6 +65,11 @@ public class FilmServiceLogic implements FilmService {
                 .sorted(Comparator.comparingInt(film -> film.getLikes().size()))
                 .limit(count)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Film getFilm(Integer id) {
+        return inMemoryFilmStorage.getFilm(id);
     }
 
 }
