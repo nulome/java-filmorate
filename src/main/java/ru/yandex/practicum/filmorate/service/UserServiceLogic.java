@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.related.ValidationException;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,28 +68,32 @@ public class UserServiceLogic implements UserService {
     }
 
     @Override
-    public Set<Integer> getFriendsList(Integer userId) {
-        log.trace("Получен запрос GET /{}/friends", userId);
-        return inMemoryUserStorage.getUser(userId).getFriendsList();
+    public List<User> getFriendsList(Integer userId) {
+        log.trace("Получен запрос GET /users/{}/friends", userId);
+        List<User> users = new ArrayList<>();
+        for (Integer id : inMemoryUserStorage.getUser(userId).getFriendsList()) {
+            users.add(inMemoryUserStorage.getUser(id));
+        }
+        return users;
     }
 
     @Override
-    public Set<Integer> getCommonFriend(Integer userId, Integer friendId) {
-        log.trace("Получен запрос GET /{}/friends/common/{}", userId, friendId);
+    public List<User> getCommonFriend(Integer userId, Integer friendId) {
+        log.trace("Получен запрос GET /users/{}/friends/common/{}", userId, friendId);
         User user = inMemoryUserStorage.getUser(userId);
         User friend = inMemoryUserStorage.getUser(friendId);
-        Set<Integer> commonList = new HashSet<>();
+        List<User> users = new ArrayList<>();
         for (Integer idList : user.getFriendsList()) {
             if (friend.getFriendsList().contains(idList)) {
-                commonList.add(idList);
+                users.add(inMemoryUserStorage.getUser(idList));
             }
         }
-        return commonList;
+        return users;
     }
 
     @Override
     public User getUser(Integer id) {
-        log.trace("Получен запрос GET /{}", id);
+        log.trace("Получен запрос GET /users/{}", id);
         return inMemoryUserStorage.getUser(id);
     }
 

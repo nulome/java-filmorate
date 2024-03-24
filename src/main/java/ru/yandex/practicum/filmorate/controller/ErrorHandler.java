@@ -1,21 +1,28 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import ru.yandex.practicum.filmorate.controller.FilmController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
+import ru.yandex.practicum.filmorate.related.UnknownValueException;
+import ru.yandex.practicum.filmorate.related.ValidationException;
 
-import java.util.Map;
-
-@ControllerAdvice("ru.yandex.practicum.filmorate.controller")
+@RestControllerAdvice
 public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIncorrectParameterException(final RuntimeException e) {
+    public ErrorResponse handleValidationException(final ValidationException e) {
         return new ErrorResponse(
-                "Ошибка данных", "Подробное описание, где именно произошла ошибка"
+                "Ошибка данных", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleUnknownValueException(final UnknownValueException e) {
+        return new ErrorResponse(
+                "Неизвестное значение", e.getMessage()
         );
     }
 }

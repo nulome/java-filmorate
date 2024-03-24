@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.related.Constants;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +32,9 @@ public class FilmServiceLogic implements FilmService {
     @Override
     public Film updateFilm(Film film) {
         log.info("Получен запрос Put /films - {}", film.getName());
+        if (film.getLikes() == null) {
+            film.setLikes(new HashSet<>());
+        }
         return inMemoryFilmStorage.updateFilm(film);
     }
 
@@ -53,7 +55,7 @@ public class FilmServiceLogic implements FilmService {
 
     @Override
     public Set<Integer> deleteLikes(Integer filmId, Integer userId) {
-        log.debug("Получен запрос DELETE /users/{}/friends/{} - удаление лайка", filmId, userId);
+        log.debug("Получен запрос DELETE /films/{}/friends/{} - удаление лайка", filmId, userId);
         Film film = inMemoryFilmStorage.getFilm(filmId);
         film.getLikes().remove(userId);
         inMemoryFilmStorage.updateFilm(film);
@@ -63,12 +65,12 @@ public class FilmServiceLogic implements FilmService {
     @Override
     public List<Film> getPopularMovies(Integer count) {
         log.trace("Получен запрос GET /films/popular?count={} - топ по лайкам", count);
-        if(count==null){
-            count= Constants.DEFAULT_POPULAR_VALUE;
+        if (count == null) {
+            count = Constants.DEFAULT_POPULAR_VALUE;
         }
         List<Film> films = inMemoryFilmStorage.getFilms();
         return films.stream()
-                .sorted(Comparator.comparingInt(film -> film.getLikes().size()))
+                .sorted(this::compare)
                 .limit(count)
                 .collect(Collectors.toList());
     }
@@ -76,6 +78,10 @@ public class FilmServiceLogic implements FilmService {
     @Override
     public Film getFilm(Integer id) {
         return inMemoryFilmStorage.getFilm(id);
+    }
+
+    private int compare(Film film1, Film film2) {
+        return film2.getLikes().size() - film1.getLikes().size();
     }
 
 }

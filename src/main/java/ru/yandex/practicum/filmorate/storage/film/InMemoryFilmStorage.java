@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.related.UnknownValueException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +42,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     private void validContains(Integer id) {
         if (!filmMap.containsKey(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + id + " фильма");
+            throw new UnknownValueException("Не верный " + id + " фильма");
         }
     }
 }

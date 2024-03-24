@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.related.UnknownValueException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +44,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     private void validContains(Integer id) {
         if (!userMap.containsKey(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + id + " пользователя");
+            throw new UnknownValueException("Не верный " + id + " пользователя");
         }
     }
 }
