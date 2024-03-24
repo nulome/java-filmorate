@@ -16,14 +16,12 @@ import java.util.List;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
-    private final Logger log = LoggerFactory.getLogger(UserController.class);
     private final HashMap<Integer, User> userMap = new HashMap<>();
     int id = 1;
 
 
     @Override
     public User createUser(User user) {
-        validation(user);
         user.setId(id);
         userMap.put(id, user);
         id++;
@@ -32,9 +30,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        validation(user);
         if (!userMap.containsKey(user.getId())) {
-            log.warn("Не верный id пользователя");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный id пользователя");
         }
         userMap.put(user.getId(), user);
@@ -48,21 +44,5 @@ public class InMemoryUserStorage implements UserStorage {
         return filmList;
     }
 
-    private void validation(User user) throws ValidationException {
-        checkName(user);
-        String message;
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            message = "дата рождения не может быть в будущем";
-        } else {
-            return;
-        }
-        log.warn(message);
-        throw new ValidationException(message);
-    }
 
-    private void checkName(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-    }
 }
