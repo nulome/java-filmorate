@@ -26,7 +26,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         if (!filmMap.containsKey(film.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный id фильма");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + film.getId() + " фильма");
         }
         filmMap.put(film.getId(), film);
         return film;
@@ -36,5 +36,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Film> getFilms() {
         List<Film> filmList = new ArrayList<>(filmMap.values());
         return filmList;
+    }
+
+    @Override
+    public Film getFilm(Integer id) {
+        if (!filmMap.containsKey(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + id + " фильма");
+        }
+        return filmMap.get(id);
     }
 }

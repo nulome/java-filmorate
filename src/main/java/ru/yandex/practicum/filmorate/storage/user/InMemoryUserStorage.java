@@ -1,15 +1,10 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
-import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.related.ValidationException;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +26,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         if (!userMap.containsKey(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный id пользователя");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + user.getId() + " пользователя");
         }
         userMap.put(user.getId(), user);
 
@@ -44,5 +39,12 @@ public class InMemoryUserStorage implements UserStorage {
         return filmList;
     }
 
+    @Override
+    public User getUser(Integer id) {
+        if (!userMap.containsKey(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + id + " пользователя");
+        }
+        return userMap.get(id);
+    }
 
 }

@@ -7,16 +7,18 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.related.ValidationException;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
 public class UserServiceLogic implements UserService {
 
-    InMemoryUserStorage inMemoryUserStorage;
+    UserStorage inMemoryUserStorage;
     private final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Override
@@ -35,11 +37,55 @@ public class UserServiceLogic implements UserService {
 
     @Override
     public List<User> getUsers() {
-        log.info("Получен запрос Get /users");
+        log.trace("Получен запрос Get /users");
         return inMemoryUserStorage.getUsers();
     }
 
-    private void validation(User user) throws ValidationException {
+    @Override
+    public Set<Integer> addUserFriend(Integer userId, Integer friendId) {
+        log.info("Получен запрос ***");
+        User user = inMemoryUserStorage.getUser(userId);
+        User friend = inMemoryUserStorage.getUser(friendId);
+        user.getFriendsList().add(friendId);
+        friend.getFriendsList().add(userId);
+        inMemoryUserStorage.updateUser(user);
+        inMemoryUserStorage.updateUser(friend);
+        return user.getFriendsList();
+    }
+
+    @Override
+    public Set<Integer> deleteUserFriend(Integer userId, Integer friendId) {
+        log.info("Получен запрос ***");
+        User user = inMemoryUserStorage.getUser(userId);
+        User friend = inMemoryUserStorage.getUser(friendId);
+        user.getFriendsList().remove(friendId);
+        friend.getFriendsList().remove(userId);
+        inMemoryUserStorage.updateUser(user);
+        inMemoryUserStorage.updateUser(friend);
+        return user.getFriendsList();
+    }
+
+    @Override
+    public Set<Integer> getFriendsList(Integer userId) {
+        log.trace("Получен запрос ***");
+        return inMemoryUserStorage.getUser(userId).getFriendsList();
+    }
+
+    @Override
+    public Set<Integer> getCommonFriend(Integer userId, Integer friendId) {
+        log.trace("Получен запрос ***");
+        User user = inMemoryUserStorage.getUser(userId);
+        User friend = inMemoryUserStorage.getUser(friendId);
+        Set<Integer> commonList = new HashSet<>();
+        for (Integer idList : user.getFriendsList()) {
+            if (friend.getFriendsList().contains(idList)) {
+                commonList.add(idList);
+            }
+        }
+        return commonList;
+    }
+
+    private void validation(User user) {
         checkName(user);
         String message;
         if (user.getBirthday().isAfter(LocalDate.now())) {
