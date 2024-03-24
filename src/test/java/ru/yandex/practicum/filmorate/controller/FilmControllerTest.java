@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmServiceLogic;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -19,11 +21,10 @@ class FilmControllerTest {
     FilmController filmController;
     Film film;
     Validator validator;
-/*
 
     @BeforeEach
     void create() {
-        filmController = new FilmController();
+        filmController = new FilmController(new FilmServiceLogic(new InMemoryFilmStorage()));
         film = Film.builder()
                 .name("nameFilm")
                 .description("description")
@@ -68,6 +69,5 @@ class FilmControllerTest {
         violations = validator.validate(film);
         assertFalse(violations.isEmpty(), "Продолжительность фильма должна быть положительной");
     }
-*/
 
 }
