@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.related.ConstraintUserLogin;
 
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Builder

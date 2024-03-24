@@ -25,6 +25,7 @@ public class UserServiceLogic implements UserService {
     public User createUser(User user) {
         log.info("Получен запрос Post /users - {}", user.getLogin());
         validation(user);
+        user.setFriendsList(new HashSet<>());
         return inMemoryUserStorage.createUser(user);
     }
 
@@ -43,7 +44,7 @@ public class UserServiceLogic implements UserService {
 
     @Override
     public Set<Integer> addUserFriend(Integer userId, Integer friendId) {
-        log.info("Получен запрос ***");
+        log.info("Получен запрос PUT /users/{}/friends/{}", userId, friendId);
         User user = inMemoryUserStorage.getUser(userId);
         User friend = inMemoryUserStorage.getUser(friendId);
         user.getFriendsList().add(friendId);
@@ -55,7 +56,7 @@ public class UserServiceLogic implements UserService {
 
     @Override
     public Set<Integer> deleteUserFriend(Integer userId, Integer friendId) {
-        log.info("Получен запрос ***");
+        log.info("Получен запрос DELETE /users/{}/friends/{}", userId, friendId);
         User user = inMemoryUserStorage.getUser(userId);
         User friend = inMemoryUserStorage.getUser(friendId);
         user.getFriendsList().remove(friendId);
@@ -67,13 +68,13 @@ public class UserServiceLogic implements UserService {
 
     @Override
     public Set<Integer> getFriendsList(Integer userId) {
-        log.trace("Получен запрос ***");
+        log.trace("Получен запрос GET /{}/friends", userId);
         return inMemoryUserStorage.getUser(userId).getFriendsList();
     }
 
     @Override
     public Set<Integer> getCommonFriend(Integer userId, Integer friendId) {
-        log.trace("Получен запрос ***");
+        log.trace("Получен запрос GET /{}/friends/common/{}", userId, friendId);
         User user = inMemoryUserStorage.getUser(userId);
         User friend = inMemoryUserStorage.getUser(friendId);
         Set<Integer> commonList = new HashSet<>();
@@ -87,6 +88,7 @@ public class UserServiceLogic implements UserService {
 
     @Override
     public User getUser(Integer id) {
+        log.trace("Получен запрос GET /{}", id);
         return inMemoryUserStorage.getUser(id);
     }
 

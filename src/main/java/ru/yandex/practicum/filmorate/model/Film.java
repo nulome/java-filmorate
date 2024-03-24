@@ -5,9 +5,11 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.related.ConstraintReleaseDate;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Builder

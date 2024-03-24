@@ -25,24 +25,25 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        if (!filmMap.containsKey(film.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + film.getId() + " фильма");
-        }
+        validContains(film.getId());
         filmMap.put(film.getId(), film);
         return film;
     }
 
     @Override
     public List<Film> getFilms() {
-        List<Film> filmList = new ArrayList<>(filmMap.values());
-        return filmList;
+        return new ArrayList<>(filmMap.values());
     }
 
     @Override
     public Film getFilm(Integer id) {
+        validContains(id);
+        return filmMap.get(id);
+    }
+
+    private void validContains(Integer id) {
         if (!filmMap.containsKey(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + id + " фильма");
         }
-        return filmMap.get(id);
     }
 }

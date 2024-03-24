@@ -25,9 +25,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        if (!userMap.containsKey(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + user.getId() + " пользователя");
-        }
+        validContains(user.getId());
         userMap.put(user.getId(), user);
 
         return user;
@@ -41,10 +39,13 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUser(Integer id) {
-        if (!userMap.containsKey(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + id + " пользователя");
-        }
+        validContains(id);
         return userMap.get(id);
     }
 
+    private void validContains(Integer id) {
+        if (!userMap.containsKey(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный " + id + " пользователя");
+        }
+    }
 }
