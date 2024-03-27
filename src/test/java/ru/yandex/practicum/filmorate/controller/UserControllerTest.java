@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.related.ValidationException;
+import ru.yandex.practicum.filmorate.service.UserServiceLogic;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -23,7 +25,7 @@ class UserControllerTest {
 
     @BeforeEach
     void create() {
-        userController = new UserController();
+        userController = new UserController(new UserServiceLogic(new InMemoryUserStorage()));
         user = User.builder()
                 .login("userLogin")
                 .name("userName")
@@ -85,4 +87,5 @@ class UserControllerTest {
         assertFalse(violations.isEmpty(), "email не может быть пустым");
 
     }
+
 }
