@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.related.Constants;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class FilmServiceLogic implements FilmService {
 
     private final FilmStorage inMemoryFilmStorage;
+    private final UserStorage inMemoryUserStorage;
 
     @Override
     public Film createFilm(Film film) {
@@ -44,6 +46,7 @@ public class FilmServiceLogic implements FilmService {
     @Override
     public Set<Integer> addLikes(Integer filmId, Integer userId) {
         log.debug("Получен запрос PUT /films/{}/like/{} - лайк фильму", filmId, userId);
+        inMemoryUserStorage.getUser(userId);
         Film film = inMemoryFilmStorage.getFilm(filmId);
         film.getLikes().add(userId);
         inMemoryFilmStorage.updateFilm(film);
@@ -53,6 +56,7 @@ public class FilmServiceLogic implements FilmService {
     @Override
     public Set<Integer> deleteLikes(Integer filmId, Integer userId) {
         log.debug("Получен запрос DELETE /films/{}/friends/{} - удаление лайка", filmId, userId);
+        inMemoryUserStorage.getUser(userId);
         Film film = inMemoryFilmStorage.getFilm(filmId);
         film.getLikes().remove(userId);
         inMemoryFilmStorage.updateFilm(film);
