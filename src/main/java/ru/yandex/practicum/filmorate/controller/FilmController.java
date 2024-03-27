@@ -1,24 +1,20 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.FilmServiceLogic;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-    FilmService filmServiceLogic;
 
-    @Autowired
-    public FilmController(FilmServiceLogic filmServiceLogic) {
-        this.filmServiceLogic = filmServiceLogic;
-    }
+    private final FilmService filmServiceLogic;
 
     @PostMapping
     public Film createFilm(@RequestBody @Valid Film film) {
