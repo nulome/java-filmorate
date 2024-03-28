@@ -1,74 +1,57 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.related.ValidationException;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-
-    private final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final HashMap<Integer, User> userMap = new HashMap<>();
-    int id = 1;
+    private final UserService userServiceLogic;
 
     @PostMapping
-    public User createUser(@RequestBody @Valid User user) throws ValidationException {
-        log.info("Получен запрос Post /users - {}", user.getLogin());
-        validation(user);
-        user.setId(id);
-        userMap.put(id, user);
-        id++;
-        return user;
+    public User createUser(@RequestBody @Valid User user) {
+        return userServiceLogic.createUser(user);
     }
 
-
     @PutMapping
-    public User updateUser(@RequestBody @Valid User user) throws ValidationException {
-        log.info("Получен запрос Put /users - {}", user.getLogin());
-        validation(user);
-        if (!userMap.containsKey(user.getId())) {
-            log.warn("Не верный id пользователя");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не верный id пользователя");
-        }
-        userMap.put(user.getId(), user);
-
-        return user;
+    public User updateUser(@RequestBody @Valid User user) {
+        return userServiceLogic.updateUser(user);
     }
 
     @GetMapping
     public List<User> getUsers() {
-        log.info("Получен запрос Get /users");
-        List<User> filmList = new ArrayList<>(userMap.values());
-        return filmList;
+        return userServiceLogic.getUsers();
     }
 
-
-    private void validation(User user) throws ValidationException {
-        checkName(user);
-        String message;
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            message = "дата рождения не может быть в будущем";
-        } else {
-            return;
-        }
-        log.warn(message);
-        throw new ValidationException(message);
+    @GetMapping("/{userId}")
+    public User getUser(@PathVariable int userId) {
+        return userServiceLogic.getUser(userId);
     }
 
-    private void checkName(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+    @PutMapping("/{userId}/friends/{friendId}")
+    public Set<Integer> addUserFriend(@PathVariable int userId, @PathVariable int friendId) {
+        return userServiceLogic.addUserFriend(userId, friendId);
+    }
+
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public Set<Integer> deleteUserFriend(@PathVariable int userId, @PathVariable int friendId) {
+        return userServiceLogic.deleteUserFriend(userId, friendId);
+    }
+
+    @GetMapping("/{userId}/friends")
+    public List<User> getFriendsList(@PathVariable int userId) {
+        return userServiceLogic.getFriendsList(userId);
+    }
+
+    @GetMapping("/{userId}/friends/common/{otherId}")
+    public List<User> getCommonFriend(@PathVariable int userId, @PathVariable int otherId) {
+        return userServiceLogic.getCommonFriend(userId, otherId);
     }
 }

@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.related.ConstraintUserLogin;
 
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Builder
 @Data
@@ -16,6 +17,6 @@ public class User {
     String name;
     @Email
     String email;
-    //@Past
     LocalDate birthday;
+    Set<Integer> friendsList;
 }
