@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.related.ConstraintReleaseDate;
+import ru.yandex.practicum.filmorate.related.FilmGenre;
+import ru.yandex.practicum.filmorate.related.FilmRating;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
@@ -20,9 +22,9 @@ public class Film {
     @Size(max = 200)
     String description;
     @NotBlank
-    ArrayList<String> genre;
+    ArrayList<FilmGenre> genre;
     @NotBlank
-    String rating;
+    FilmRating rating;
     @ConstraintReleaseDate
     LocalDate releaseDate;
     @PositiveOrZero
