@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Set;
 
 @Builder
@@ -18,6 +19,10 @@ public class Film {
     String name;
     @Size(max = 200)
     String description;
+    @NotBlank
+    ArrayList<String> genre;
+    @NotBlank
+    String rating;
     @ConstraintReleaseDate
     LocalDate releaseDate;
     @PositiveOrZero
