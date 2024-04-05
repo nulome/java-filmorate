@@ -18,6 +18,5 @@ public class User {
     @Email
     String email;
     LocalDate birthday;
-    Set<Integer> waitingAddAsFriend;
     Set<Integer> friendsList;
 }
