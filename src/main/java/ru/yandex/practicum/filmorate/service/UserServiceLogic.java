@@ -18,50 +18,50 @@ import java.util.Set;
 @Slf4j
 public class UserServiceLogic implements UserService {
 
-    private final UserStorage inMemoryUserStorage;
+    private final UserStorage dataUserStorage;
 
     @Override
     public User createUser(User user) {
         log.info("Получен запрос Post /users - {}", user.getLogin());
         validation(user);
         user.setFriendsList(new HashSet<>());
-        return inMemoryUserStorage.createUser(user);
+        return dataUserStorage.createUser(user);
     }
 
     @Override
     public User updateUser(User user) {
         log.info("Получен запрос Put /users - {}", user.getLogin());
         validation(user);
-        return inMemoryUserStorage.updateUser(user);
+        return dataUserStorage.updateUser(user);
     }
 
     @Override
     public List<User> getUsers() {
         log.trace("Получен запрос Get /users");
-        return inMemoryUserStorage.getUsers();
+        return dataUserStorage.getUsers();
     }
 
     @Override
     public Set<Integer> addUserFriend(Integer userId, Integer friendId) {
         log.info("Получен запрос PUT /users/{}/friends/{}", userId, friendId);
-        User user = inMemoryUserStorage.getUser(userId);
-        User friend = inMemoryUserStorage.getUser(friendId);
+        User user = dataUserStorage.getUser(userId);
+        User friend = dataUserStorage.getUser(friendId);
         user.getFriendsList().add(friendId);
         friend.getFriendsList().add(userId);
-        inMemoryUserStorage.updateUser(user);
-        inMemoryUserStorage.updateUser(friend);
+        dataUserStorage.updateUser(user);
+        dataUserStorage.updateUser(friend);
         return user.getFriendsList();
     }
 
     @Override
     public Set<Integer> deleteUserFriend(Integer userId, Integer friendId) {
         log.info("Получен запрос DELETE /users/{}/friends/{}", userId, friendId);
-        User user = inMemoryUserStorage.getUser(userId);
-        User friend = inMemoryUserStorage.getUser(friendId);
+        User user = dataUserStorage.getUser(userId);
+        User friend = dataUserStorage.getUser(friendId);
         user.getFriendsList().remove(friendId);
         friend.getFriendsList().remove(userId);
-        inMemoryUserStorage.updateUser(user);
-        inMemoryUserStorage.updateUser(friend);
+        dataUserStorage.updateUser(user);
+        dataUserStorage.updateUser(friend);
         return user.getFriendsList();
     }
 
@@ -69,8 +69,8 @@ public class UserServiceLogic implements UserService {
     public List<User> getFriendsList(Integer userId) {
         log.trace("Получен запрос GET /users/{}/friends", userId);
         List<User> users = new ArrayList<>();
-        for (Integer id : inMemoryUserStorage.getUser(userId).getFriendsList()) {
-            users.add(inMemoryUserStorage.getUser(id));
+        for (Integer id : dataUserStorage.getUser(userId).getFriendsList()) {
+            users.add(dataUserStorage.getUser(id));
         }
         return users;
     }
@@ -78,12 +78,12 @@ public class UserServiceLogic implements UserService {
     @Override
     public List<User> getCommonFriend(Integer userId, Integer friendId) {
         log.trace("Получен запрос GET /users/{}/friends/common/{}", userId, friendId);
-        User user = inMemoryUserStorage.getUser(userId);
-        User friend = inMemoryUserStorage.getUser(friendId);
+        User user = dataUserStorage.getUser(userId);
+        User friend = dataUserStorage.getUser(friendId);
         List<User> users = new ArrayList<>();
         for (Integer idList : user.getFriendsList()) {
             if (friend.getFriendsList().contains(idList)) {
-                users.add(inMemoryUserStorage.getUser(idList));
+                users.add(dataUserStorage.getUser(idList));
             }
         }
         return users;
@@ -92,7 +92,7 @@ public class UserServiceLogic implements UserService {
     @Override
     public User getUser(Integer id) {
         log.trace("Получен запрос GET /users/{}", id);
-        return inMemoryUserStorage.getUser(id);
+        return dataUserStorage.getUser(id);
     }
 
     private void validation(User user) {

@@ -18,48 +18,50 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FilmServiceLogic implements FilmService {
 
-    private final FilmStorage inMemoryFilmStorage;
-    private final UserStorage inMemoryUserStorage;
+    private final FilmStorage dataFilmStorage;
+    private final UserStorage dataUserStorage;
 
     @Override
     public Film createFilm(Film film) {
         log.info("Получен запрос Post /films - {}", film.getName());
-        film.setLikes(new HashSet<>());
-        return inMemoryFilmStorage.createFilm(film);
+//        if (film.getLikes() == null) {
+//            film.setLikes(new HashSet<>());
+//        }
+        return dataFilmStorage.createFilm(film);
     }
 
     @Override
     public Film updateFilm(Film film) {
         log.info("Получен запрос Put /films - {}", film.getName());
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
-        }
-        return inMemoryFilmStorage.updateFilm(film);
+//        if (film.getLikes() == null) {
+//            film.setLikes(new HashSet<>());
+//        }
+        return dataFilmStorage.updateFilm(film);
     }
 
     @Override
     public List<Film> getFilms() {
         log.trace("Получен запрос Get /films");
-        return inMemoryFilmStorage.getFilms();
+        return dataFilmStorage.getFilms();
     }
 
     @Override
     public Set<Integer> addLikes(Integer filmId, Integer userId) {
         log.debug("Получен запрос PUT /films/{}/like/{} - лайк фильму", filmId, userId);
-        inMemoryUserStorage.getUser(userId);
-        Film film = inMemoryFilmStorage.getFilm(filmId);
+        dataUserStorage.getUser(userId);
+        Film film = dataFilmStorage.getFilm(filmId);
         film.getLikes().add(userId);
-        inMemoryFilmStorage.updateFilm(film);
+        dataFilmStorage.updateFilm(film);
         return film.getLikes();
     }
 
     @Override
     public Set<Integer> deleteLikes(Integer filmId, Integer userId) {
         log.debug("Получен запрос DELETE /films/{}/friends/{} - удаление лайка", filmId, userId);
-        inMemoryUserStorage.getUser(userId);
-        Film film = inMemoryFilmStorage.getFilm(filmId);
+        dataUserStorage.getUser(userId);
+        Film film = dataFilmStorage.getFilm(filmId);
         film.getLikes().remove(userId);
-        inMemoryFilmStorage.updateFilm(film);
+        dataFilmStorage.updateFilm(film);
         return film.getLikes();
     }
 
@@ -69,7 +71,7 @@ public class FilmServiceLogic implements FilmService {
         if (count == null) {
             count = Constants.DEFAULT_POPULAR_VALUE;
         }
-        List<Film> films = inMemoryFilmStorage.getFilms();
+        List<Film> films = dataFilmStorage.getFilms();
         return films.stream()
                 .sorted(this::compare)
                 .limit(count)
@@ -78,7 +80,8 @@ public class FilmServiceLogic implements FilmService {
 
     @Override
     public Film getFilm(Integer id) {
-        return inMemoryFilmStorage.getFilm(id);
+        log.trace("Получен запрос GET /films/{}", id);
+        return dataFilmStorage.getFilm(id);
     }
 
     private int compare(Film film1, Film film2) {

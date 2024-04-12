@@ -32,7 +32,7 @@ public class FilmController {
     }
 
     @GetMapping("/{filmId}")
-    public Film getUser(@PathVariable int filmId) {
+    public Film getFilm(@PathVariable int filmId) {
         return filmServiceLogic.getFilm(filmId);
     }
 
