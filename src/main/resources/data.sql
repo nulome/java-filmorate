@@ -7,7 +7,7 @@ VALUES ('Godzilla', 'Les', 'G', '2022-01-05', 100), ('PgAdmin', 'adm', 'PG', '20
 
 INSERT INTO users (login, name, email, birthday)
 VALUES ('nulome', 'Roman', 'mmm@mm.mm', '2000-01-01'), ('mazer', 'Masta', 'rr@rr.rr', '1920-04-01'),
-('Ass', null, 'gg@gg.gg', '1980-01-21'), ('ford', 'Corp', 'ass@ss.aa', '2017-02-05'),
+('Ass', 'Ass', 'gg@gg.gg', '1980-01-21'), ('ford', 'Corp', 'ass@ss.aa', '2017-02-05'),
 ('sda', 'dtt', 'lmk@km.nm', '2004-04-04'), ('Asura', 'Roman', 'v33@vsd.gg', '2020-05-02');
 
 INSERT INTO film_genres (film_id, genre_id) VALUES (1, 1), (2, 4), (3, 3), (4, 2), (5, 6), (6, 5),

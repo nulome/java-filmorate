@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.related.FilmGenre;
 import ru.yandex.practicum.filmorate.related.UnknownValueException;
@@ -19,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Repository
 @Primary
 @Slf4j
 @RequiredArgsConstructor
@@ -56,12 +57,12 @@ public class FilmRepositoryImpl implements FilmStorage {
     @Override
     public List<Film> getFilms() {
         try {
-            return jdbcTemplate.queryForObject("SELECT f.id, f.name, f.description, g.genre,\n" +
-                    "f.rating, f.releasedate, f.duration, l.user_id as likes\n" +
-                    "FROM films f\n" +
-                    "LEFT JOIN film_genres fg ON f.id = fg.film_id\n" +
-                    "LEFT JOIN genre g ON fg.genre_id = g.genre_id\n" +
-                    "LEFT JOIN likes l ON f.id = l.film_id\n" +
+            return jdbcTemplate.queryForObject("SELECT f.id, f.name, f.description, g.genre, " +
+                    "f.rating, f.releasedate, f.duration, l.user_id as likes " +
+                    "FROM films f " +
+                    "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
+                    "LEFT JOIN genre g ON fg.genre_id = g.genre_id " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
                     "ORDER BY f.id DESC", listAllMapper());
         } catch (EmptyResultDataAccessException e) {
             log.error("Ошибка в запросе к базе данных. \n {}", e.getMessage());
@@ -72,20 +73,20 @@ public class FilmRepositoryImpl implements FilmStorage {
     @Override
     public Film getFilm(Integer id) {
         try {
-            return jdbcTemplate.queryForObject("SELECT f.id, f.name, f.description, g.genre,\n" +
-                    "f.rating, f.releasedate, f.duration, l.user_id AS likes\n" +
-                    "FROM films f\n" +
-                    "LEFT JOIN film_genres fg ON f.id = fg.film_id\n" +
-                    "LEFT JOIN genre g ON fg.genre_id = g.genre_id\n" +
-                    "LEFT JOIN likes l ON f.id = l.film_id\n" +
-                    "WHERE f.id = ?", this::filmRowMapper, id);
+            return jdbcTemplate.queryForObject("SELECT f.id, f.name, f.description, g.genre, " +
+                    "f.rating, f.releasedate, f.duration, l.user_id AS likes " +
+                    "FROM films f " +
+                    "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
+                    "LEFT JOIN genre g ON fg.genre_id = g.genre_id " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "WHERE f.id = ?", this::filmMapper, id);
         } catch (EmptyResultDataAccessException e) {
             log.error("Ошибка в запросе к базе данных. Не найдено значение по id: {} \n {}", id, e.getMessage());
             throw new UnknownValueException("Не верный id: " + id + " фильма");
         }
     }
 
-    private Film filmRowMapper(ResultSet rs, int rowNum) throws SQLException {
+    private Film filmMapper(ResultSet rs, int rowNum) throws SQLException {
         Film film = createFilm(rs);
         do {
             addLikeAndGenre(rs, film);
