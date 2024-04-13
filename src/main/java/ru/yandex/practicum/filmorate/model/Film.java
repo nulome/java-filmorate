@@ -22,14 +22,11 @@ public class Film {
     String name;
     @Size(max = 200)
     String description;
-    @NotNull
     Set<FilmGenre> genre;
-    @NotBlank
     String rating;
     @ConstraintReleaseDate
     LocalDate releaseDate;
     @PositiveOrZero
     Integer duration;
-    @NotNull
     Set<Integer> likes;
 }

@@ -2,13 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.related.Constants;
+import ru.yandex.practicum.filmorate.related.UnknownValueException;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,23 +19,18 @@ import java.util.stream.Collectors;
 public class FilmServiceLogic implements FilmService {
 
     private final FilmStorage dataFilmStorage;
-    private final UserStorage dataUserStorage;
+    private final UserService userServiceLogic;
 
     @Override
     public Film createFilm(Film film) {
         log.info("Получен запрос Post /films - {}", film.getName());
-//        if (film.getLikes() == null) {
-//            film.setLikes(new HashSet<>());
-//        }
         return dataFilmStorage.createFilm(film);
     }
 
     @Override
     public Film updateFilm(Film film) {
         log.info("Получен запрос Put /films - {}", film.getName());
-//        if (film.getLikes() == null) {
-//            film.setLikes(new HashSet<>());
-//        }
+        checkAndProvideFilmInDataBase(film.getId());
         return dataFilmStorage.updateFilm(film);
     }
 
@@ -48,8 +43,8 @@ public class FilmServiceLogic implements FilmService {
     @Override
     public Set<Integer> addLikes(Integer filmId, Integer userId) {
         log.debug("Получен запрос PUT /films/{}/like/{} - лайк фильму", filmId, userId);
-        dataUserStorage.getUser(userId);
-        Film film = dataFilmStorage.getFilm(filmId);
+        userServiceLogic.getUser(userId);
+        Film film = checkAndProvideFilmInDataBase(filmId);
         film.getLikes().add(userId);
         dataFilmStorage.updateFilm(film);
         return film.getLikes();
@@ -58,8 +53,8 @@ public class FilmServiceLogic implements FilmService {
     @Override
     public Set<Integer> deleteLikes(Integer filmId, Integer userId) {
         log.debug("Получен запрос DELETE /films/{}/friends/{} - удаление лайка", filmId, userId);
-        dataUserStorage.getUser(userId);
-        Film film = dataFilmStorage.getFilm(filmId);
+        userServiceLogic.getUser(userId);
+        Film film = checkAndProvideFilmInDataBase(filmId);
         film.getLikes().remove(userId);
         dataFilmStorage.updateFilm(film);
         return film.getLikes();
@@ -81,11 +76,19 @@ public class FilmServiceLogic implements FilmService {
     @Override
     public Film getFilm(Integer id) {
         log.trace("Получен запрос GET /films/{}", id);
-        return dataFilmStorage.getFilm(id);
+        return checkAndProvideFilmInDataBase(id);
     }
 
     private int compare(Film film1, Film film2) {
         return film2.getLikes().size() - film1.getLikes().size();
     }
 
+    private Film checkAndProvideFilmInDataBase(Integer id) {
+        try {
+            return dataFilmStorage.getFilm(id);
+        } catch (EmptyResultDataAccessException e) {
+            log.error("Ошибка в запросе к базе данных. Не найдено значение по id: {} \n {}", id, e.getMessage());
+            throw new UnknownValueException("Не верный id фильма: " + id);
+        }
+    }
 }
