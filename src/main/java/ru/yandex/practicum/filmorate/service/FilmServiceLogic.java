@@ -83,7 +83,7 @@ public class FilmServiceLogic implements FilmService {
 
     @Override
     public List<Genre> getGenres() {
-        return null;
+        return dataFilmStorage.getGenres();
     }
 
     @Override
@@ -92,13 +92,13 @@ public class FilmServiceLogic implements FilmService {
     }
 
     @Override
-    public List<MPA> getMpa() {
-        return null;
+    public List<MPA> getMpas() {
+        return dataFilmStorage.getMpas();
     }
 
     @Override
-    public MPA getMpas(Integer id) {
-        return null;
+    public MPA getMpa(Integer id) {
+        return dataFilmStorage.getMpa(id);
     }
 
     private int compare(Film film1, Film film2) {

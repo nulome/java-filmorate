@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -29,13 +28,13 @@ public class RelatingController {
     }
 
     @GetMapping("/mpa")
-    public List<MPA> getMpa() {
-        return filmServiceLogic.getMpa();
+    public List<MPA> getMpas() {
+        return filmServiceLogic.getMpas();
     }
 
     @GetMapping("/mpa/{id}")
-    public MPA getMpas(@PathVariable Integer id) {
-        return filmServiceLogic.getMpas(id);
+    public MPA getMpa(@PathVariable Integer id) {
+        return filmServiceLogic.getMpa(id);
     }
 
 }

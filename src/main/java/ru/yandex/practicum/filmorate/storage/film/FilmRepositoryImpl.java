@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -10,17 +11,13 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
-import ru.yandex.practicum.filmorate.related.FilmGenre;
+import ru.yandex.practicum.filmorate.related.UnknownValueException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
-@Primary
 @Slf4j
 @RequiredArgsConstructor
 public class FilmRepositoryImpl implements FilmStorage {
@@ -54,43 +51,79 @@ public class FilmRepositoryImpl implements FilmStorage {
     @Override
     public List<Film> getFilms() {
         return jdbcTemplate.queryForObject("SELECT f.id, f.name, f.description, f.releasedate, f.duration, " +
-                "l.user_id AS likes, fg.genre_id AS genres, fm.mpa_id AS mpa " +
+                "l.user_id AS likes, fg.genre_id, g.name AS genre_name, fm.mpa_id, m.name AS mpa_name " +
                 "FROM films f " +
                 "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
+                "LEFT JOIN genre g ON fg.genre_id = g.id " +
                 "LEFT JOIN film_mpa fm ON f.id = fm.film_id " +
-                "LEFT JOIN likes l ON f.id = l.film_id " +
-                "ORDER BY f.id", mapperListAllFilms());
+                "LEFT JOIN mpa m ON fm.mpa_id = m.id " +
+                "LEFT JOIN likes l ON f.id = l.film_id ORDER BY f.id", mapperListAllFilms());
     }
 
     @Override
     public Film getFilm(Integer id) {
         return jdbcTemplate.queryForObject("SELECT f.id, f.name, f.description, f.releasedate, f.duration, " +
-                "l.user_id AS likes, fg.genre_id AS genres, fm.mpa_id AS mpa " +
+                "l.user_id AS likes, fg.genre_id, g.name AS genre_name, fm.mpa_id, m.name AS mpa_name " +
                 "FROM films f " +
                 "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
+                "LEFT JOIN genre g ON fg.genre_id = g.id " +
                 "LEFT JOIN film_mpa fm ON f.id = fm.film_id " +
+                "LEFT JOIN mpa m ON fm.mpa_id = m.id " +
                 "LEFT JOIN likes l ON f.id = l.film_id " +
-                "WHERE f.id = ?", this::mapperFilm, id);
+                "WHERE f.id = ? " +
+                "ORDER BY f.id", this::mapperFilm, id);
     }
 
     @Override
     public List<Genre> getGenres() {
-        return null;
+        return jdbcTemplate.queryForObject("SELECT g.id AS genre_id, g.name AS genre_name FROM genre g ORDER BY g.id",
+                (rs, rowNum) -> {
+                    List<Genre> genresList = new ArrayList<>();
+                    if (rs.getInt("id") == 0) {
+                        return genresList;
+                    }
+                    do {
+                        genresList.add(createGenreBuilder(rs));
+                    } while (rs.next());
+                    return genresList;
+                });
     }
 
     @Override
     public Genre getGenre(Integer id) {
-        return null;
+        try {
+            return jdbcTemplate.queryForObject("SELECT g.id AS genre_id, g.name AS genre_name FROM genre g WHERE id = ?",
+                    (rs, rowNum) -> createGenreBuilder(rs), id);
+        } catch (EmptyResultDataAccessException e) {
+            log.error("Ошибка в запросе к базе данных. Не верный id: {} \n {}", id, e.getMessage());
+            throw new UnknownValueException("Не верный id жанра: " + id);
+        }
     }
 
     @Override
-    public List<MPA> getMpa() {
-        return null;
+    public List<MPA> getMpas() {
+        return jdbcTemplate.queryForObject("SELECT m.id AS mpa_id, m.name AS mpa_name FROM mpa m ORDER BY m.id",
+                (rs, rowNum) -> {
+                    List<MPA> mpaList = new ArrayList<>();
+                    if (rs.getInt("id") == 0) {
+                        return mpaList;
+                    }
+                    do {
+                        mpaList.add(createMpaBuilder(rs));
+                    } while (rs.next());
+                    return mpaList;
+                });
     }
 
     @Override
-    public MPA getMpas(Integer id) {
-        return null;
+    public MPA getMpa(Integer id) {
+        try {
+            return jdbcTemplate.queryForObject("SELECT m.id AS mpa_id, m.name AS mpa_name FROM mpa m WHERE id = ?",
+                    (rs, rowNum) -> createMpaBuilder(rs), id);
+        } catch (EmptyResultDataAccessException e) {
+            log.error("Ошибка в запросе к базе данных. Не верный id: {} \n {}", id, e.getMessage());
+            throw new UnknownValueException("Не верный id рейтинга: " + id);
+        }
     }
 
     private Film mapperFilm(ResultSet rs, int rowNum) throws SQLException {
@@ -129,26 +162,22 @@ public class FilmRepositoryImpl implements FilmStorage {
                 .releaseDate(rs.getDate("releasedate").toLocalDate())
                 .duration(rs.getInt("duration"))
                 .likes(new HashSet<>())
-                .genres(new HashSet<>())
+                .genres(new TreeSet<>())
                 .build();
     }
 
-    private int numberCaseGenreFromDataBase(FilmGenre genre) {
-        switch (genre) {
-            case COMEDY:
-                return 1;
-            case DRAMA:
-                return 2;
-            case CARTOON:
-                return 3;
-            case THRILLER:
-                return 4;
-            case DOCUMENTARY:
-                return 5;
-            case BLOCKBUSTER:
-                return 6;
-        }
-        return -1;
+    private Genre createGenreBuilder(ResultSet rs) throws SQLException {
+        return Genre.builder()
+                .id(rs.getInt("genre_id"))
+                .name(rs.getString("genre_name"))
+                .build();
+    }
+
+    private MPA createMpaBuilder(ResultSet rs) throws SQLException {
+        return MPA.builder()
+                .id(rs.getInt("mpa_id"))
+                .name(rs.getString("mpa_name"))
+                .build();
     }
 
     private void updMpaAndGenreAndLikeInDataBase(Film film) {
@@ -175,31 +204,18 @@ public class FilmRepositoryImpl implements FilmStorage {
         }
     }
 
-
     private void addLikeAndGenreInFilm(ResultSet rs, Film film) throws SQLException {
         if (rs.getInt("likes") != 0) {
             film.getLikes().add(rs.getInt("likes"));
         }
 
-        if (rs.getString("genres") != null) {
+        if (rs.getString("genre_name") != null) {
             film.getGenres().add(createGenreBuilder(rs));
         }
 
-        if (rs.getInt("mpa") != 0) {
+        if (film.getMpa() == null && rs.getInt("mpa_id") != 0) {
             film.setMpa(createMpaBuilder(rs));
         }
-    }
-
-    private Genre createGenreBuilder(ResultSet rs) throws SQLException {
-        return Genre.builder()
-                .id(rs.getInt("genres"))
-                .build();
-    }
-
-    private MPA createMpaBuilder(ResultSet rs) throws SQLException {
-        return MPA.builder()
-                .id(rs.getInt("mpa"))
-                .build();
     }
 }
 

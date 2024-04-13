@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-@Primary
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserStorage {
 
@@ -47,25 +45,22 @@ public class UserRepositoryImpl implements UserStorage {
 
     @Override
     public List<User> getUsers() {
-        List<User> list = jdbcTemplate.queryForObject("SELECT u.id, u.login, u.name, u.email, u.birthday, f.friend_id" +
+        return jdbcTemplate.queryForObject("SELECT u.id, u.login, u.name, u.email, u.birthday, f.friend_id" +
                 " FROM users u LEFT JOIN friends f ON u.id = f.user_id ORDER BY u.id", mapperListAllUser());
-
-        return list;
     }
 
 
     @Override
     public User getUser(Integer id) {
-        User user = jdbcTemplate.queryForObject("SELECT u.id, u.login, u.name, u.email, u.birthday, f.friend_id" +
+        return jdbcTemplate.queryForObject("SELECT u.id, u.login, u.name, u.email, u.birthday, f.friend_id" +
                 " FROM users u LEFT JOIN friends f ON u.id = f.user_id WHERE u.id = ?", (rs, rowNum) -> {
-            User user1 = createUserBuilder(rs);
+            User user = createUserBuilder(rs);
             do {
-                addListFriendsInUser(rs, user1);
+                addListFriendsInUser(rs, user);
             } while (rs.next());
 
-            return user1;
+            return user;
         }, id);
-        return user;
     }
 
     private RowMapper<List<User>> mapperListAllUser() {

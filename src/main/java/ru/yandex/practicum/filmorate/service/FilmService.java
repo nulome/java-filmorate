@@ -26,7 +26,7 @@ public interface FilmService {
 
     Genre getGenre(Integer id);
 
-    List<MPA> getMpa();
+    List<MPA> getMpas();
 
-    MPA getMpas(Integer id);
+    MPA getMpa(Integer id);
 }
