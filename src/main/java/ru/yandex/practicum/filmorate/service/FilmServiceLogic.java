@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.related.Constants;
 import ru.yandex.practicum.filmorate.related.UnknownValueException;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -77,6 +79,26 @@ public class FilmServiceLogic implements FilmService {
     public Film getFilm(Integer id) {
         log.trace("Получен запрос GET /films/{}", id);
         return checkAndProvideFilmInDataBase(id);
+    }
+
+    @Override
+    public List<Genre> getGenres() {
+        return null;
+    }
+
+    @Override
+    public Genre getGenre(Integer id) {
+        return dataFilmStorage.getGenre(id);
+    }
+
+    @Override
+    public List<MPA> getMpa() {
+        return null;
+    }
+
+    @Override
+    public MPA getMpas(Integer id) {
+        return null;
     }
 
     private int compare(Film film1, Film film2) {

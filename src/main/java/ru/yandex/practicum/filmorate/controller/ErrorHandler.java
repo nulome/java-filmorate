@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,6 +22,24 @@ public class ErrorHandler {
         log.error("Error 400 {}", e.getMessage());
         return new ErrorResponse(
                 "Ошибка данных", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDataIntegrityViolationException(final DataIntegrityViolationException e) {
+        log.error("Error 400 {}", e.getMessage());
+        return new ErrorResponse(
+                "Ошибка в переданных данных", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleBadSqlGrammarException(final BadSqlGrammarException e) {
+        log.error("Error 500 {}", e.getMessage());
+        return new ErrorResponse(
+                "Ошибка при запросе к базе данных.", e.getMessage()
         );
     }
 
@@ -53,7 +73,7 @@ public class ErrorHandler {
 
 
     /*
-    EmptyResultDataAccessException
+
 
 
     @ExceptionHandler

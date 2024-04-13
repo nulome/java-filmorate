@@ -38,8 +38,8 @@ public class UserRepositoryImpl implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        jdbcTemplate.update("update users set login = ?, name  = ?, email  = ?, birthday  = ? " +
-                        "where id = ?", user.getLogin(), user.getName(), user.getEmail(),
+        jdbcTemplate.update("UPDATE users SET login = ?, name  = ?, email  = ?, birthday  = ? " +
+                        "WHERE id = ?", user.getLogin(), user.getName(), user.getEmail(),
                 user.getBirthday(), user.getId());
         updFriendsListInDataBase(user);
         return getUser(user.getId());
@@ -47,8 +47,8 @@ public class UserRepositoryImpl implements UserStorage {
 
     @Override
     public List<User> getUsers() {
-        List<User> list = jdbcTemplate.queryForObject("select u.id, u.login, u.name, u.email, u.birthday, f.friend_id" +
-                " from users u left join friends f on u.id = f.id order by u.id", mapperListAllUser());
+        List<User> list = jdbcTemplate.queryForObject("SELECT u.id, u.login, u.name, u.email, u.birthday, f.friend_id" +
+                " FROM users u LEFT JOIN friends f ON u.id = f.user_id ORDER BY u.id", mapperListAllUser());
 
         return list;
     }
@@ -56,8 +56,8 @@ public class UserRepositoryImpl implements UserStorage {
 
     @Override
     public User getUser(Integer id) {
-        User user = jdbcTemplate.queryForObject("select u.id, u.login, u.name, u.email, u.birthday, f.friend_id" +
-                " from users u left join friends f on u.id = f.id where u.id = ?", (rs, rowNum) -> {
+        User user = jdbcTemplate.queryForObject("SELECT u.id, u.login, u.name, u.email, u.birthday, f.friend_id" +
+                " FROM users u LEFT JOIN friends f ON u.id = f.user_id WHERE u.id = ?", (rs, rowNum) -> {
             User user1 = createUserBuilder(rs);
             do {
                 addListFriendsInUser(rs, user1);
@@ -94,10 +94,10 @@ public class UserRepositoryImpl implements UserStorage {
     }
 
     private void updFriendsListInDataBase(User user) {
-        jdbcTemplate.update("DELETE FROM friends WHERE id = ?", user.getId());
+        jdbcTemplate.update("DELETE FROM friends WHERE user_id = ?", user.getId());
         if (!user.getFriendsList().isEmpty()) {
             for (Integer friend : user.getFriendsList()) {
-                jdbcTemplate.update("insert into friends (id, friend_id) values (?, ?)", user.getId(), friend);
+                jdbcTemplate.update("INSERT INTO friends (user_id, friend_id) VALUES (?, ?)", user.getId(), friend);
             }
         }
     }
