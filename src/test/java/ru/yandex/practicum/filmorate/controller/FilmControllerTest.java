@@ -38,7 +38,7 @@ class FilmControllerTest {
     @BeforeEach
     void create() {
         filmController = new FilmController(new FilmServiceLogic(new FilmRepositoryImpl(jdbcTemplate),
-                new UserServiceLogic(new UserRepositoryImpl(jdbcTemplate))));
+               new UserRepositoryImpl(jdbcTemplate)));
         MPA mpa = MPA.builder()
                 .id(1)
                 .name("G")
