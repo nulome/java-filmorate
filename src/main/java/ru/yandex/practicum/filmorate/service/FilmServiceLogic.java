@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.related.Constants;
 import ru.yandex.practicum.filmorate.related.UnknownValueException;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 import java.util.Set;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 public class FilmServiceLogic implements FilmService {
 
     private final FilmStorage dataFilmStorage;
-    private final UserService userServiceLogic;
+    private final UserStorage dataUserStorage;
 
     @Override
     public Film createFilm(Film film) {
@@ -45,7 +47,7 @@ public class FilmServiceLogic implements FilmService {
     @Override
     public Set<Integer> addLikes(Integer filmId, Integer userId) {
         log.debug("Получен запрос PUT /films/{}/like/{} - лайк фильму", filmId, userId);
-        userServiceLogic.getUser(userId);
+        checkAndReceiptUserInDataBase(userId);
         Film film = checkAndProvideFilmInDataBase(filmId);
         film.getLikes().add(userId);
         dataFilmStorage.updateFilm(film);
@@ -55,7 +57,7 @@ public class FilmServiceLogic implements FilmService {
     @Override
     public Set<Integer> deleteLikes(Integer filmId, Integer userId) {
         log.debug("Получен запрос DELETE /films/{}/friends/{} - удаление лайка", filmId, userId);
-        userServiceLogic.getUser(userId);
+        checkAndReceiptUserInDataBase(userId);
         Film film = checkAndProvideFilmInDataBase(filmId);
         film.getLikes().remove(userId);
         dataFilmStorage.updateFilm(film);
@@ -111,6 +113,15 @@ public class FilmServiceLogic implements FilmService {
         } catch (EmptyResultDataAccessException e) {
             log.error("Ошибка в запросе к базе данных. Не найдено значение по id: {} \n {}", id, e.getMessage());
             throw new UnknownValueException("Не верный id фильма: " + id);
+        }
+    }
+
+    private User checkAndReceiptUserInDataBase(Integer id) {
+        try {
+            return dataUserStorage.getUser(id);
+        } catch (EmptyResultDataAccessException e) {
+            log.error("Ошибка в запросе к базе данных. Не найдено значение по id: {} \n {}", id, e.getMessage());
+            throw new UnknownValueException("Передан не верный id: " + id);
         }
     }
 }
